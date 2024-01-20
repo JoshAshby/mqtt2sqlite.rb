@@ -50,7 +50,8 @@ Configuration = Struct.new(:database, :output_dir, :broker_uri, :tables, :subscr
       )
     end
 
-    Configuration.new(database, output_dir, broker_uri, tables, subscriptions)
+    # Configuration.new(database, output_dir, broker_uri, tables, subscriptions)
+    Configuration.new(broker_uri, tables, subscriptions)
   end
 end
 
