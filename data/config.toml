@@ -1,0 +1,223 @@
+broker = "mqtt://boulder.local:1883"
+
+# MARK: Table Definitions
+
+[[tables]]
+name = "meeting_signs"
+[[tables.columns]]
+name = "topic"
+[[tables.columns]]
+name = "state"
+
+[[tables]]
+name = "motion_sensors"
+[[tables.columns]]
+name = "topic"
+[[tables.columns]]
+name = "state"
+
+[[tables]]
+name = "contact_sensors"
+[[tables.columns]]
+name = "topic"
+[[tables.columns]]
+name = "contact"
+
+[[tables]]
+name = "climate_sensors"
+[[tables.columns]]
+name = "topic"
+[[tables.columns]]
+name = "temperature"
+[[tables.columns]]
+name = "humidity"
+[[tables.columns]]
+name = "voc"
+[[tables.columns]]
+name = "pressure"
+
+[[tables]]
+name = "device_batteries"
+[[tables.columns]]
+name = "topic"
+[[tables.columns]]
+name = "battery_percent"
+[[tables.columns]]
+name = "battery_low"
+[[tables.columns]]
+name = "last_seen_epoch"
+[[tables.columns]]
+name = "last_seen"
+generated_as = "datetime(round(last_seen_epoch / 1000), 'unixepoch')"
+
+[[tables]]
+name = "internet_speed_tests"
+[[tables.columns]]
+name = "upload_bps"
+[[tables.columns]]
+name = "upload_mbps"
+generated_as = "upload_bps / 125000"
+[[tables.columns]]
+name = "download_bps"
+[[tables.columns]]
+name = "download_mbps"
+generated_as = "download_bps / 125000"
+[[tables.columns]]
+name = "latency_ms"
+
+
+# MARK: Subscriptions
+# MARK: Subscriptions/Internet speeds table
+
+[[subscriptions]]
+topic = "homekit/house/internet/speed-tests"
+table = "internet_speed_tests"
+[[subscriptions.columns]]
+name = "upload_bps"
+type = "jsonpath"
+value = ".upload.bandwidth"
+[[subscriptions.columns]]
+name = "download_bps"
+type = "jsonpath"
+value = ".download.bandwidth"
+[[subscriptions.columns]]
+name = "latency_ms"
+type = "jsonpath"
+value = ".ping.latency"
+
+
+# MARK: Subscriptions/Device battery state table
+
+[[subscriptions]]
+topic = "zigbee/#"
+table = "device_batteries"
+
+[[subscriptions.filters]]
+type = "jsonpath"
+value = ".battery"
+
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "battery_percent"
+type = "jsonpath"
+value = ".battery"
+[[subscriptions.columns]]
+name = "last_seen_epoch"
+type = "jsonpath"
+value = ".last_seen"
+
+[[subscriptions]]
+topic = "zigbee/#"
+table = "device_batteries"
+
+[[subscriptions.filters]]
+type = "jsonpath"
+value = ".battery_low"
+
+# This is a plugged-in sensor but it still reports a "battery_low" status for
+# some reason?
+[[subscriptions.filters]]
+type = "topic_regex"
+value = "^(?!zigbee/basement/presence/linptech-1).*$"
+
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "battery_low"
+type = "jsonpath"
+value = ".battery_low"
+[[subscriptions.columns]]
+name = "last_seen_epoch"
+type = "jsonpath"
+value = ".last_seen"
+
+
+# MARK: Motion sensor tables
+
+[[subscriptions]]
+topic = "homekit/house/zones/+/motion"
+table = "motion_sensors"
+
+[[subscriptions.filters]]
+type = "jsonpath"
+value = ".state"
+
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "state"
+type = "jsonpath"
+value = "."
+
+
+# MARK: Subscriptions/Climate sensors
+
+[[subscriptions]]
+topic = "zigbee/#"
+table = "climate_sensors"
+
+[[subscriptions.filters]]
+type = "jsonpath"
+value = ".temperature"
+
+# Some devices like the contact sensors also report temperature, so this
+# filters them down to just the sensors that I care about.
+[[subscriptions.filters]]
+type = "topic_regex"
+value = "(/temp/)"
+
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "temperature"
+type = "jsonpath"
+value = ".temperature"
+[[subscriptions.columns]]
+name = "humidity"
+type = "jsonpath"
+value = ".humidity"
+[[subscriptions.columns]]
+name = "pressure"
+type = "jsonpath"
+value = ".pressure"
+
+
+# MARK: Subscriptions/Contact sensors
+
+[[subscriptions]]
+topic = "zigbee/#"
+table = "contact_sensors"
+
+[[subscriptions.filters]]
+type = "jsonpath"
+value = ".contact"
+[[subscriptions.filters]]
+type = "topic_regex"
+value = "(windows|doors)"
+
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "contact"
+type = "jsonpath"
+value = ".contact"
+
+
+# MARK: Subscriptions/Meeting statuses
+
+[[subscriptions]]
+topic = "homekit/people/+/meeting-status"
+table = "meeting_signs"
+[[subscriptions.columns]]
+name = "topic"
+type = "topic"
+[[subscriptions.columns]]
+name = "state"
+type = "jsonpath"
+value = "."
