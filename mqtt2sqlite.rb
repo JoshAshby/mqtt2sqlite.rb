@@ -126,14 +126,14 @@ MQTT_CLIENT.get do |topic, msg|
 
   subscriptions.each do |subscription|
     # pp [topic, subscription, msg]
-    puts "Processing a message from topic `\e[32m#{topic}\e[0m` ..."
-    puts "\t#{msg}"
+    # puts "Processing a message from topic `\e[32m#{topic}\e[0m` ..."
+    # puts "\t#{msg}"
 
     data = subscription.columns.reduce({}) do |memo, column|
       memo.merge({ column.name => column.value_for(topic, msg) })
     end
 
-    puts "\tInserting into `\e[31m#{subscription.table}\e[0m`: #{data}"
+    # puts "\tInserting into `\e[31m#{subscription.table}\e[0m`: #{data}"
 
     DB[subscription.table.to_sym].insert(data)
   end

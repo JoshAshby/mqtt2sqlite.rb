@@ -1,4 +1,4 @@
-broker = "mqtt://boulder.local:1883"
+broker = "mqtt://192.168.174.3:1883"
 
 # MARK: Table Definitions
 
@@ -28,13 +28,16 @@ name = "climate_sensors"
 [[tables.columns]]
 name = "topic"
 [[tables.columns]]
-name = "temperature"
+name = "temperature_c"
 [[tables.columns]]
-name = "humidity"
+name = "temperature_f"
+generated_as = "(CAST(temperature_c as DECIMAL) * 1.8) + 32"
 [[tables.columns]]
-name = "voc"
+name = "humidity_percent"
 [[tables.columns]]
-name = "pressure"
+name = "voc_ppm"
+[[tables.columns]]
+name = "pressure_hpa"
 
 [[tables]]
 name = "device_batteries"
@@ -174,15 +177,15 @@ value = "(/temp/)"
 name = "topic"
 type = "topic"
 [[subscriptions.columns]]
-name = "temperature"
+name = "temperature_c"
 type = "jsonpath"
 value = ".temperature"
 [[subscriptions.columns]]
-name = "humidity"
+name = "humidity_percent"
 type = "jsonpath"
 value = ".humidity"
 [[subscriptions.columns]]
-name = "pressure"
+name = "pressure_hpa"
 type = "jsonpath"
 value = ".pressure"
 
