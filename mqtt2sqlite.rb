@@ -21,7 +21,7 @@ require "mqtt"
 require "jsonpath"
 
 
-Configuration = Struct.new(:database, :output_dir, :broker_uri, :tables, :subscriptions) do
+Configuration = Struct.new(:broker_uri, :tables, :subscriptions) do
   def self.parse_config(data)
     # output_dir = data.dig("output_dir")
     # database = File.join(output_dir, data.dig("database"))
